@@ -21,7 +21,7 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200
 };
-app.use(cors(corsOptions));
+app.use(cors({ origin: '*', optionsSuccessStatus: 200 }));
 app.use(express.json());
 
 // nodemailer transporter
@@ -62,7 +62,7 @@ app.post('/api/send', async (req, res) => {
     });
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: 'メール送信に失敗しました' });
+    res.status(500).json({ error: 'メール送信に失敗しました', details: err && err.toString ? err.toString() : err });
   }
 });
 
