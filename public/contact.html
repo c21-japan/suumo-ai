@@ -67,7 +67,7 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>送信中...';
         try {
-            const res = await fetch('/api/send', {
+            const res = await fetch('https://suumo-backend.onrender.com/api/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: 'contact', ...data })
