@@ -1,41 +1,15 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
 const cors = require('cors');
 require('dotenv').config();
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const allowedOrigins = [
-  'https://suumo-ai.vercel.app',
-  'http://localhost:3000'
-];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200
-};
 app.use(cors({ origin: '*', optionsSuccessStatus: 200 }));
 app.use(express.json());
 
-// nodemailer transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
-
-// メール送信API
+// メール送信API（Mailjet）
 app.post('/api/send', async (req, res) => {
   const { type, ...data } = req.body;
   let subject = '【SUUMO AI君】新規お問い合わせ';
@@ -54,15 +28,35 @@ app.post('/api/send', async (req, res) => {
   }
 
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: 'support@century21.group',
-      subject,
-      text
+    const response = await axios.post('https://api.mailjet.com/v3.1/send', {
+      Messages: [
+        {
+          From: {
+            Email: process.env.MJ_FROM,
+            Name: 'SUUMO AI君'
+          },
+          To: [
+            {
+              Email: process.env.MJ_TO,
+              Name: 'サポート'
+            }
+          ],
+          Subject: subject,
+          TextPart: text
+        }
+      ]
+    }, {
+      auth: {
+        username: process.env.MJ_APIKEY_PUBLIC,
+        password: process.env.MJ_APIKEY_PRIVATE
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: 'メール送信に失敗しました', details: err && err.toString ? err.toString() : err });
+    res.status(500).json({ error: 'メール送信に失敗しました', details: err && err.response && err.response.data ? err.response.data : err.toString() });
   }
 });
 
