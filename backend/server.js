@@ -6,7 +6,14 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'https://suumo-ai.vercel.app', // Vercelの本番URL
+    'http://localhost:3000' // ローカル開発用（必要なら）
+  ],
+  credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // nodemailer transporter
