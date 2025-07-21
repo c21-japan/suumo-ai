@@ -28,7 +28,7 @@
         <div class="container mx-auto px-6 max-w-2xl">
             <h2 class="text-3xl font-bold mb-8 text-gray-800 text-center">お問い合わせ</h2>
             <div class="bg-white rounded-2xl shadow p-8">
-                <form id="contactForm" class="space-y-6" action="https://suumo-backend.onrender.com/api/send" method="POST">
+                <form id="contactForm" class="space-y-6" action="http://localhost:3001/api/send" method="POST">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">お名前</label>
                         <input type="text" name="name" class="w-full p-4 border rounded-xl" placeholder="山田太郎" required>
@@ -67,7 +67,7 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>送信中...';
         try {
-            const res = await fetch('https://suumo-backend.onrender.com/api/send', {
+            const res = await fetch('http://localhost:3001/api/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: 'contact', ...data })
